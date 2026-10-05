@@ -1,0 +1,30 @@
+name: Install Fixed Project
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  unpack:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Unpack fixed project
+        run: |
+          mkdir extracted
+          unzip -q predictive-logistics-command-fixed.zip -d extracted
+          cp -a extracted/predictive-logistics-fixed/. .
+          rm -rf extracted predictive-logistics-command-fixed.zip
+
+      - name: Commit corrected structure
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git diff --cached --quiet || git commit -m "Fix project structure and deployment"
+          git push
