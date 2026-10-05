@@ -1,4 +1,4 @@
-name: Install Fixed Project
+name: Fix Project Structure
 
 on:
   workflow_dispatch:
@@ -7,50 +7,229 @@ permissions:
   contents: write
 
 jobs:
-  unpack:
+  repair:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Find and unpack fixed project
+      - name: Create project structure
         run: |
-          ZIP_FILE=$(find . -maxdepth 1 -type f -iname "*.zip" | head -n 1)
+          mkdir -p database models services templates static/css static/js data tests
 
-          if [ -z "$ZIP_FILE" ]; then
-            echo "ERROR: No ZIP file found in repository root."
-            exit 1
-          fi
+          # Python packages
+          touch database/__init__.py
+          touch models/__init__.py
+          touch services/__init__.py
+          touch tests/__init__.py
 
-          echo "Using ZIP: $ZIP_FILE"
+          # Database
+          [ -f seed.py ] && mv seed.py database/seed.py
+          [ -f db.py ] && mv db.py services/db.py
 
-          mkdir -p extracted
-          unzip -q "$ZIP_FILE" -d extracted
+          # Models
+          for f in prediction_engine.py risk_engine.py recommendation_engine.py route_engine.py
+          do
+            [ -f "$f" ] && mv "$f" models/
+          done
 
-          PROJECT_DIR=$(find extracted -type f -name "app.py" -print -quit | xargs dirname)
+          # Services
+          for f in alert_service.py inventory_service.py convoy_service.py simulation_service.py weather_service.py
+          do
+            [ -f "$f" ] && mv "$f" services/
+          done
 
-          if [ -z "$PROJECT_DIR" ]; then
-            echo "ERROR: app.py not found inside ZIP."
-            exit 1
-          fi
+          # Templates
+          for f in *.html
+          do
+            [ -f "$f" ] && mv "$f" templates/
+          done
 
-          echo "Project directory: $PROJECT_DIR"
+          # Data
+          for f in *.csv
+          do
+            [ -f "$f" ] && mv "$f" data/
+          done
 
-          cp -a "$PROJECT_DIR"/. .
+          # Tests
+          for f in test_*.py conftest.py
+          do
+            [ -f "$f" ] && mv "$f" tests/
+          done
 
-          rm -rf extracted "$ZIP_FILE"
+          # CSS
+          [ -f style.css ] && mv style.css static/css/style.css
 
-      - name: Commit corrected structure
+      - name: Create database schema
         run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          cat > database/schema.sql <<'EOF'
+          PRAGMA foreign_keys = ON;
 
-          git add -A
+          CREATE TABLE IF NOT EXISTS units (
+            id INTEGER PRIMARY KEY,
+            name TEXT UNIQUE NOT NULL,
+            location TEXT NOT NULL,
+            lat REAL NOT NULL,
+            lon REAL NOT NULL,
+            personnel INTEGER NOT NULL,
+            weather_id INTEGER
+          );
 
-          if git diff --cached --quiet; then
-            echo "No changes to commit."
-          else
-            git commit -m "Fix project structure and deployment"
-            git push
-          fi
+          CREATE TABLE IF NOT EXISTS inventory (
+            id INTEGER PRIMARY KEY,
+            unit_id INTEGER NOT NULL,
+            resource TEXT NOT NULL,
+            category TEXT NOT NULL,
+            unit TEXT NOT NULL,
+            available REAL NOT NULL,
+            required REAL NOT NULL,
+            safety_stock REAL NOT NULL,
+            daily_consumption REAL NOT NULL
+          );
+
+          CREATE TABLE IF NOT EXISTS consumption_history (
+            id INTEGER PRIMARY KEY,
+            unit_id INTEGER NOT NULL,
+            resource TEXT NOT NULL,
+            day TEXT NOT NULL,
+            quantity REAL NOT NULL
+          );
+
+          CREATE TABLE IF NOT EXISTS depots (
+            id INTEGER PRIMARY KEY,
+            name TEXT UNIQUE NOT NULL,
+            lat REAL NOT NULL,
+            lon REAL NOT NULL,
+            fuel REAL NOT NULL,
+            food REAL NOT NULL,
+            water REAL NOT NULL,
+            medical REAL NOT NULL,
+            spare_parts REAL NOT NULL
+          );
+
+          CREATE TABLE IF NOT EXISTS routes (
+            id INTEGER PRIMARY KEY,
+            route_id TEXT UNIQUE NOT NULL,
+            origin_id INTEGER NOT NULL,
+            destination_unit_id INTEGER NOT NULL,
+            distance_km REAL NOT NULL,
+            eta_hours REAL NOT NULL,
+            risk_score REAL NOT NULL,
+            weather_impact REAL NOT NULL,
+            status TEXT NOT NULL
+          );
+
+          CREATE TABLE IF NOT EXISTS convoys (
+            id INTEGER PRIMARY KEY,
+            convoy_id TEXT UNIQUE NOT NULL,
+            origin_id INTEGER NOT NULL,
+            destination_unit_id INTEGER NOT NULL,
+            cargo TEXT NOT NULL,
+            quantity REAL NOT NULL,
+            departure TEXT NOT NULL,
+            eta TEXT NOT NULL,
+            status TEXT NOT NULL,
+            delay_hours REAL NOT NULL,
+            risk_score REAL NOT NULL
+          );
+
+          CREATE TABLE IF NOT EXISTS weather (
+            id INTEGER PRIMARY KEY,
+            location TEXT NOT NULL,
+            condition TEXT NOT NULL,
+            temperature REAL NOT NULL,
+            impact TEXT NOT NULL,
+            impact_score REAL NOT NULL,
+            observed_at TEXT NOT NULL
+          );
+
+          CREATE TABLE IF NOT EXISTS alerts (
+            id INTEGER PRIMARY KEY,
+            timestamp TEXT NOT NULL,
+            severity TEXT NOT NULL,
+            unit_id INTEGER,
+            resource TEXT,
+            reason TEXT NOT NULL,
+            action TEXT NOT NULL,
+            status TEXT NOT NULL
+          );
+
+          CREATE TABLE IF NOT EXISTS predictions (
+            id INTEGER PRIMARY KEY,
+            unit_id INTEGER NOT NULL,
+            resource TEXT NOT NULL,
+            predicted_daily REAL NOT NULL,
+            days_to_safety REAL NOT NULL,
+            shortage_hours REAL,
+            risk_score REAL NOT NULL,
+            confidence REAL NOT NULL,
+            explanation TEXT NOT NULL,
+            created_at TEXT NOT NULL
+          );
+
+          CREATE TABLE IF NOT EXISTS simulation_state (
+            id INTEGER PRIMARY KEY CHECK(id=1),
+            running INTEGER NOT NULL DEFAULT 0,
+            tick INTEGER NOT NULL DEFAULT 0,
+            mode TEXT NOT NULL DEFAULT 'IDLE',
+            started_at TEXT,
+            updated_at TEXT
+          );
+          EOF
+
+      - name: Create frontend JavaScript
+        run: |
+          cat > static/js/app.js <<'EOF'
+          const $=s=>document.querySelector(s);
+
+          async function api(url,opt){
+            const r=await fetch(url,opt);
+            const d=await r.json();
+            if(!r.ok) throw Error(d.error||'Request failed');
+            return d;
+          }
+
+          const esc=x=>String(x??'').replace(/[&<>"']/g,m=>({
+            '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+          }[m]));
+
+          function toast(x){
+            const e=$('#toast');
+            if(e){e.textContent=x;e.style.display='block';setTimeout(()=>e.style.display='none',2500)}
+          }
+
+          function riskClass(x){
+            return ['CRITICAL','HIGH'].includes(x)?'critical':
+                   x==='MEDIUM'?'warning':'safe';
+          }
+
+          setInterval(()=>{
+            const e=$('#clock');
+            if(e)e.textContent=new Date().toLocaleString();
+          },1000);
+
+          async function loadDashboard(){
+            const d=await api('/api/dashboard');
+
+            $('#kpis').innerHTML=[
+              ['FORWARD UNITS',d.kpis.units],
+              ['AVAILABILITY',d.kpis.availability+'%'],
+              ['ACTIVE CONVOYS',d.kpis.active_convoys],
+              ['LOW STOCK',d.kpis.low_stock],
+              ['HIGH RISK',d.kpis.high_risk],
+              ['CRITICAL ALERTS',d.kpis.critical_alerts]
+            ].map(x=>`<div class="kpi"><small>${x[0]}</small><strong>${x[1]}</strong></div>`).join('');
+
+            $('#healthScore').textContent=Math.round(d.health_score);
+            $('#healthLabel').textContent=d.health_label;
+
+            $('#resources').innerHTML=d.resources.map(r=>
+              `<div class="bar"><label>${esc(r.resource)}</label>
+              <div class="bar-track"><div class="bar-fill" style="width:${r.availability}%"></div></div>
+              <b>${r.availability}%</b></div>`).join('');
+
+            $('#riskFocus').innerHTML=
+              `<div class="risk-card">
+              <span class="pill ${riskClass(d.risk_focus.risk_level)}">${d.risk_focus.risk_level}</span>
+              <h3>${d.risk_focus.resource} — ${
