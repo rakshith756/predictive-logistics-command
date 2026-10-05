@@ -1,0 +1,9 @@
+id,location,condition,temperature,impact,impact_score,observed_at
+1,Sector North,Clear,26.0,LOW,10.0,2026-10-05T01:09:32.739882
+2,Sector East,Cloudy,22.0,MEDIUM,35.0,2026-10-05T01:09:32.739882
+3,Sector Central,Heavy Rain,18.0,HIGH,75.0,2026-10-05T01:09:32.739882
+4,Sector West,Clear,25.0,LOW,12.0,2026-10-05T01:09:32.739882
+5,Sector Ridge,Windy,20.0,MEDIUM,45.0,2026-10-05T01:09:32.739882
+6,Sector South,Light Rain,21.0,MEDIUM,40.0,2026-10-05T01:09:32.739882
+7,Sector Valley,Clear,24.0,LOW,8.0,2026-10-05T01:09:32.739882
+8,Sector Plain,Cloudy,23.0,LOW,25.0,2026-10-05T01:09:32.739882

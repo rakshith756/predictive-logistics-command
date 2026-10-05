@@ -1,0 +1,9 @@
+id,name,location,lat,lon,personnel,weather_id
+1,UNIT ALPHA,Sector North,15.2,76.15,420,1
+2,UNIT BRAVO,Sector East,15.25,76.28,390,2
+3,UNIT CHARLIE,Sector Central,15.12,76.3,480,3
+4,UNIT DELTA,Sector West,15.08,76.05,360,4
+5,UNIT ECHO,Sector Ridge,15.32,76.08,510,5
+6,UNIT FOXTROT,Sector South,14.98,76.24,440,6
+7,UNIT GOLF,Sector Valley,15.4,76.32,310,7
+8,UNIT HOTEL,Sector Plain,15.0,76.02,280,8

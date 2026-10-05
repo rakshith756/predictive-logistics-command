@@ -1,0 +1,41 @@
+id,unit_id,resource,category,unit,available,required,safety_stock,daily_consumption
+1,1,Fuel,Energy,L,1260.0,1890.0,525.0,756.0
+2,1,Food,Rations,kg,5460.0,6300.0,1890.0,546.0
+3,1,Water,Water,L,11025.0,12600.0,3675.0,1102.5
+4,1,Medical,Medical,packs,892.5,1260.0,420.0,68.2
+5,1,Spare Parts,Maintenance,units,325.5,472.5,126.0,23.1
+6,2,Fuel,Energy,L,1140.0,1710.0,475.0,684.0
+7,2,Food,Rations,kg,4940.0,5700.0,1710.0,494.0
+8,2,Water,Water,L,9975.0,11400.0,3325.0,997.5
+9,2,Medical,Medical,packs,807.5,1140.0,380.0,61.8
+10,2,Spare Parts,Maintenance,units,294.5,427.5,114.0,20.9
+11,3,Fuel,Energy,L,1200.0,1800.0,500.0,720.0
+12,3,Food,Rations,kg,5200.0,6000.0,1800.0,520.0
+13,3,Water,Water,L,10500.0,12000.0,3500.0,1050.0
+14,3,Medical,Medical,packs,850.0,1200.0,400.0,65.0
+15,3,Spare Parts,Maintenance,units,310.0,450.0,120.0,22.0
+16,4,Fuel,Energy,L,984.0,1476.0,410.0,590.4
+17,4,Food,Rations,kg,4264.0,4920.0,1476.0,426.4
+18,4,Water,Water,L,8610.0,9840.0,2870.0,861.0
+19,4,Medical,Medical,packs,697.0,984.0,328.0,53.3
+20,4,Spare Parts,Maintenance,units,254.2,369.0,98.4,18.0
+21,5,Fuel,Energy,L,1344.0,2016.0,560.0,806.4
+22,5,Food,Rations,kg,5824.0,6720.0,2016.0,582.4
+23,5,Water,Water,L,11760.0,13440.0,3920.0,1176.0
+24,5,Medical,Medical,packs,952.0,1344.0,448.0,72.8
+25,5,Spare Parts,Maintenance,units,347.2,504.0,134.4,24.6
+26,6,Fuel,Energy,L,1080.0,1620.0,450.0,648.0
+27,6,Food,Rations,kg,4680.0,5400.0,1620.0,468.0
+28,6,Water,Water,L,9450.0,10800.0,3150.0,945.0
+29,6,Medical,Medical,packs,765.0,1080.0,360.0,58.5
+30,6,Spare Parts,Maintenance,units,279.0,405.0,108.0,19.8
+31,7,Fuel,Energy,L,840.0,1260.0,350.0,504.0
+32,7,Food,Rations,kg,3640.0,4200.0,1260.0,364.0
+33,7,Water,Water,L,7350.0,8400.0,2450.0,735.0
+34,7,Medical,Medical,packs,595.0,840.0,280.0,45.5
+35,7,Spare Parts,Maintenance,units,217.0,315.0,84.0,15.4
+36,8,Fuel,Energy,L,780.0,1170.0,325.0,468.0
+37,8,Food,Rations,kg,3380.0,3900.0,1170.0,338.0
+38,8,Water,Water,L,6825.0,7800.0,2275.0,682.5
+39,8,Medical,Medical,packs,552.5,780.0,260.0,42.2
+40,8,Spare Parts,Maintenance,units,201.5,292.5,78.0,14.3
