@@ -1,7 +1,7 @@
 from flask import Flask, render_template, jsonify, request
 from flask_cors import CORS
 from config import SECRET_KEY, DATABASE_PATH
-from database.seed import seed
+from seed import seed
 from services.db import rows,row,get_db
 from services.inventory_service import inventory
 from services.convoy_service import convoys
