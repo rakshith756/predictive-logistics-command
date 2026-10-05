@@ -14,17 +14,43 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Unpack fixed project
+      - name: Find and unpack fixed project
         run: |
-          mkdir extracted
-          unzip -q predictive-logistics-command-fixed.zip -d extracted
-          cp -a extracted/predictive-logistics-fixed/. .
-          rm -rf extracted predictive-logistics-command-fixed.zip
+          ZIP_FILE=$(find . -maxdepth 1 -type f -iname "*.zip" | head -n 1)
+
+          if [ -z "$ZIP_FILE" ]; then
+            echo "ERROR: No ZIP file found in repository root."
+            exit 1
+          fi
+
+          echo "Using ZIP: $ZIP_FILE"
+
+          mkdir -p extracted
+          unzip -q "$ZIP_FILE" -d extracted
+
+          PROJECT_DIR=$(find extracted -type f -name "app.py" -print -quit | xargs dirname)
+
+          if [ -z "$PROJECT_DIR" ]; then
+            echo "ERROR: app.py not found inside ZIP."
+            exit 1
+          fi
+
+          echo "Project directory: $PROJECT_DIR"
+
+          cp -a "$PROJECT_DIR"/. .
+
+          rm -rf extracted "$ZIP_FILE"
 
       - name: Commit corrected structure
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
           git add -A
-          git diff --cached --quiet || git commit -m "Fix project structure and deployment"
-          git push
+
+          if git diff --cached --quiet; then
+            echo "No changes to commit."
+          else
+            git commit -m "Fix project structure and deployment"
+            git push
+          fi
