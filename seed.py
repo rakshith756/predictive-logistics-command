@@ -3,7 +3,7 @@ import sqlite3, math
 from datetime import datetime, timedelta
 import numpy as np
 
-BASE=Path(__file__).resolve().parent.parent
+BASE=Path(__file__).resolve().parent
 DB=BASE/'database'/'logistics.db'
 SCHEMA=(BASE/'database'/'schema.sql').read_text()
 RES=[('Fuel','Energy','L'),('Food','Rations','kg'),('Water','Water','L'),('Medical','Medical','packs'),('Spare Parts','Maintenance','units')]
