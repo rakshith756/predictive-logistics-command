@@ -46,7 +46,10 @@ def seed():
  con.executemany('INSERT INTO routes VALUES (?,?,?,?,?,?,?,?,?)',routes)
  conv=[(1,'CON-021',2,3,'Fuel',2500,(now-timedelta(hours=1)).isoformat(),(now+timedelta(hours=3.75)).isoformat(),'DELAYED',4.0,72),(2,'CON-022',1,2,'Food',3200,(now-timedelta(hours=2)).isoformat(),(now+timedelta(hours=2)).isoformat(),'ON ROUTE',0,30),(3,'CON-023',3,5,'Water',5000,(now-timedelta(hours=1)).isoformat(),(now+timedelta(hours=4)).isoformat(),'DEPARTED',0,25),(4,'CON-024',4,6,'Medical',900,(now-timedelta(hours=3)).isoformat(),(now+timedelta(hours=2)).isoformat(),'ON ROUTE',0,35),(5,'CON-025',1,4,'Fuel',1800,now.isoformat(),(now+timedelta(hours=3)).isoformat(),'PLANNED',0,20),(6,'CON-026',2,8,'Food',1600,now.isoformat(),(now+timedelta(hours=3.2)).isoformat(),'LOADING',0,18),(7,'CON-027',3,7,'Spare Parts',500,now.isoformat(),(now+timedelta(hours=2.5)).isoformat(),'PLANNED',0,15),(8,'CON-028',4,1,'Fuel',2200,now.isoformat(),(now+timedelta(hours=2.8)).isoformat(),'ON ROUTE',0,22),(9,'CON-029',1,5,'Water',4300,now.isoformat(),(now+timedelta(hours=3.1)).isoformat(),'DEPARTED',0,25),(10,'CON-030',2,6,'Food',2500,now.isoformat(),(now+timedelta(hours=3.5)).isoformat(),'ON ROUTE',0,30)]
  con.executemany('INSERT INTO convoys VALUES (?,?,?,?,?,?,?,?,?,?,?)',conv)
- con.execute("INSERT INTO simulation_state VALUES (1,0,0,'IDLE',NULL,?)",(now.isoformat(),))
+ con.execute(
+    "INSERT INTO simulation_state VALUES (1,0,0,'IDLE',?)",
+    (now.isoformat(),)
+ )
  con.commit(); con.close()
 
 if __name__=='__main__': seed(); print(DB)
